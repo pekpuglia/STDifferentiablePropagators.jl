@@ -71,7 +71,7 @@ function twobody_init(
     m0::T = tbc_m0
 ) where {Tepoch<:Number, Tkepler<:Number, T<:Number}
     # Allocate the propagator structure.
-    tbd = TwoBodyPropagator{Tepoch, T}()
+    tbd = TwoBodyPropagator{Tepoch, Tkepler}()
 
     # Assign the constant, which are used in initialization.
     tbd.μ = m0
@@ -97,10 +97,10 @@ function twobody_init!(
     orb₀::KeplerianElements
 ) where {Tepoch<:Number, T<:Number}
     # Compute the mean motion using the semi-major axis.
-    n₀ = √(tbd.μ / T(orb₀.a)^3)
+    n₀ = √(tbd.μ / orb₀.a^3)
 
     # Compute the initial mean anomaly.
-    M₀ = true_to_mean_anomaly(T(orb₀.e), T(orb₀.f))
+    M₀ = true_to_mean_anomaly(orb₀.e, orb₀.f)
 
     # Create and return the two-body orbit propagator structure.
     tbd.orb₀ = orb₀
