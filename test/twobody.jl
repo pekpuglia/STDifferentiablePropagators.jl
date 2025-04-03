@@ -31,21 +31,28 @@
 ############################################################################################
 
 @testset "Forward Diff Compat" verbose = true begin
-    function v_r0(r0)
+    function v_els(el_vector)
+        r, e, i, RAAN, omega, f = el_vector
         orb = KeplerianElements(
             date_to_jd(2023, 1, 1, 0, 0, 0),
-            r0,
-            0.001111,
-            98.405 |> deg2rad,
-            100    |> deg2rad,
-            90     |> deg2rad,
-            19     |> deg2rad
+            r,
+            e,
+            i,
+            RAAN,
+            omega,
+            f
         )
         orbp = Propagators.init(Val(:TwoBody), orb)
         Propagators.propagate!(orbp, 5.0, OrbitStateVector).v
     end
 
-    @test ForwardDiff.derivative(v_r0, 7190.982e3) isa SVector
+    @test ForwardDiff.jacobian(v_els, [
+        7190.982e3,
+        0.001111,
+        98.405 |> deg2rad,
+        100    |> deg2rad,
+        90     |> deg2rad,
+        19     |> deg2rad]) isa Matrix
 end
 
 @testset "Two-Body Orbit Propagator" verbose = true begin
