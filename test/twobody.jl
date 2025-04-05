@@ -63,6 +63,7 @@
         19     |> deg2rad,
         5.0]) isa Matrix
 
+    #chck true anomaly derivative w.r.t. time works (anomalies algorithm)
     @test ForwardDiff.derivative( t -> final_orb_elements([
         7190.982e3,
         0.001111,
@@ -70,7 +71,7 @@
         100    |> deg2rad,
         90     |> deg2rad,
         19     |> deg2rad,
-        t])[end], 5.0) isa Number
+        t])[end], 5.0) != 0.0
 
     #test when orbit is fixed and the only variable is time
     #not sure if this is needed but easy to revert
@@ -85,7 +86,8 @@
             19     |> deg2rad
         )
         orbp = Propagators.init(Val(:TwoBody), orb)
-        Propagators.propagate!(orbp, time)
+        Propagators.propagate!(orbp, time, OrbitStateVector)
+        print(orbp.tbd.orbk.f)
         [
             orbp.tbd.orbk.a
             orbp.tbd.orbk.e
@@ -96,7 +98,7 @@
         ]
     end
 
-    @test ForwardDiff.derivative(final_orb_elements, 5.0) isa Number
+    @test ForwardDiff.derivative(final_orb_elements, 5.0) isa Vector
 end
 
 @testset "Two-Body Orbit Propagator" verbose = true begin

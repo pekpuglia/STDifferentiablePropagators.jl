@@ -52,8 +52,9 @@ end
 
 function Propagators.propagate!(orbp::OrbitPropagatorTwoBody, t::Number)
     # Auxiliary variables.
-    return_type = promote_type(typeof(orbp.tbd.Δt), typeof(orbp.tbd.orb₀.a))
-    tbd = TwoBodyPropagator{typeof(orbp.tbd.Δt), return_type}(getfield.(Ref(orbp.tbd), fieldnames(typeof(orbp.tbd)))...)
+    time_type = promote_type(typeof(t), typeof(orbp.tbd.Δt))
+    return_type = promote_type(typeof(orbp.tbd.Δt), typeof(orbp.tbd.orb₀.a), typeof(t))
+    tbd = TwoBodyPropagator{time_type, return_type}(getfield.(Ref(orbp.tbd), fieldnames(typeof(orbp.tbd)))...)
 
     # Propagate the orbit.
     return twobody!(tbd, t)
