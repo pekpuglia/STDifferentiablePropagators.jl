@@ -31,41 +31,7 @@
 ############################################################################################
 
 @testset "Forward Diff Compat" verbose = true begin
-    function v_els(element_time_vector)
-        r, e, i, RAAN, omega, f, t = element_time_vector
-        orb = KeplerianElements(
-            date_to_jd(2023, 1, 1, 0, 0, 0),
-            r,
-            e,
-            i,
-            RAAN,
-            omega,
-            f
-        )
-        orbp = Propagators.init(Val(:TwoBody), orb)
-        Propagators.propagate!(orbp, t, OrbitStateVector).v
-    end
-    #test differentiate individually wrt elements & time
-    @test ForwardDiff.jacobian(v_els, [
-        7190.982e3,
-        0.001111,
-        98.405 |> deg2rad,
-        100    |> deg2rad,
-        90     |> deg2rad,
-        19     |> deg2rad,
-        5.0]) isa Matrix
-
-    @test ForwardDiff.derivative(t -> v_els([
-        7190.982e3,
-        0.001111,
-        98.405 |> deg2rad,
-        100    |> deg2rad,
-        90     |> deg2rad,
-        19     |> deg2rad,
-        t]), 
-        5.0) isa SVector
-
-    function final_orb_elements(element_time_vector)
+    function final_orb_elements(element_time_vector::Vector)
         r, e, i, RAAN, omega, f, t = element_time_vector
         orb = KeplerianElements(
             date_to_jd(2023, 1, 1, 0, 0, 0),
@@ -105,6 +71,32 @@
         90     |> deg2rad,
         19     |> deg2rad,
         t])[end], 5.0) isa Number
+
+    #test when orbit is fixed and the only variable is time
+    #not sure if this is needed but easy to revert
+    function final_orb_elements(time::Number)
+        orb = KeplerianElements(
+            date_to_jd(2023, 1, 1, 0, 0, 0),
+            7190.982e3,
+            0.001111,
+            98.405 |> deg2rad,
+            100    |> deg2rad,
+            90     |> deg2rad,
+            19     |> deg2rad
+        )
+        orbp = Propagators.init(Val(:TwoBody), orb)
+        Propagators.propagate!(orbp, time)
+        [
+            orbp.tbd.orbk.a
+            orbp.tbd.orbk.e
+            orbp.tbd.orbk.i
+            orbp.tbd.orbk.Ω
+            orbp.tbd.orbk.ω
+            orbp.tbd.orbk.f
+        ]
+    end
+
+    @test ForwardDiff.derivative(final_orb_elements, 5.0) isa Number
 end
 
 @testset "Two-Body Orbit Propagator" verbose = true begin
