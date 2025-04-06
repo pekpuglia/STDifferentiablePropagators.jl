@@ -47,8 +47,8 @@
 
     @test orbp.tbd.Δt == 50.0
 
-    function v_els(el_vector)
-        r, e, i, RAAN, omega, f = el_vector
+    function v_els(element_time_vector)
+        r, e, i, RAAN, omega, f, t = element_time_vector
         orb = KeplerianElements(
             date_to_jd(2023, 1, 1, 0, 0, 0),
             r,
@@ -59,7 +59,7 @@
             f
         )
         orbp = Propagators.init(Val(:TwoBody), orb)
-        Propagators.propagate!(orbp, 5.0, OrbitStateVector).v
+        Propagators.propagate!(orbp, t, OrbitStateVector).v
     end
 
     @test ForwardDiff.jacobian(v_els, [
@@ -68,7 +68,8 @@
         98.405 |> deg2rad,
         100    |> deg2rad,
         90     |> deg2rad,
-        19     |> deg2rad]) isa Matrix
+        19     |> deg2rad,
+        5.0]) isa Matrix
 end
 
 @testset "Two-Body Orbit Propagator" verbose = true begin
