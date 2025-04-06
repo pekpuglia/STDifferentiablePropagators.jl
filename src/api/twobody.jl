@@ -32,7 +32,7 @@ function Propagators.init(::Val{:TwoBody}, orb₀::KeplerianElements; m0::Number
         optb = OrbitPropagatorTwoBody(tbd)
     else
         orb0 = KeplerianElements{propagation_type, propagation_type}(getfield.(Ref(orb₀), fieldnames(KeplerianElements))...)
-        tbd = twobody_init(orb0; m0 = m0)
+        tbd = twobody_init(orb0; m0 = m0, propagation_type=propagation_type)
         optb = OrbitPropagatorTwoBody{propagation_type, propagation_type}(tbd)
     end
     return optb
