@@ -30,6 +30,24 @@
 #
 ############################################################################################
 
+@testset "ForwardDiff compat" verbose = true begin
+    orb = KeplerianElements(
+        date_to_jd(2023, 1, 1, 0, 0, 0),
+        7190.982e3,
+        0.001111,
+        98.405 |> deg2rad,
+        100    |> deg2rad,
+        90     |> deg2rad,
+        19     |> deg2rad
+    )
+
+    orbp = Propagators.init(Val(:TwoBody), orb)
+
+    Propagators.propagate!(orbp, 50.0, OrbitStateVector)
+
+    @test orbp.tbd.Δt == 50.0
+end
+
 @testset "Two-Body Orbit Propagator" verbose = true begin
     jd₀ = date_to_jd(1986, 6, 19, 18, 35, 0)
     jd₁ = date_to_jd(1986, 6, 19, 19, 15, 0)
