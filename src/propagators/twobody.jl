@@ -183,7 +183,7 @@ function twobody!(
 
     # Time elapsed since epoch.
     epoch  = orb₀.t
-    Δt     = T(t)
+    Δt     = t
 
     # Propagate the orbital elements.
     M_k = tbd.M₀ + tbd.n₀ * Δt
