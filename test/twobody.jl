@@ -114,7 +114,7 @@
         5.0
     ]) isa Matrix
 
-    function final_els_els(time)
+    function final_els_time(time)
         orb = KeplerianElements(
             date_to_jd(2023, 1, 1, 0, 0, 0),
             7190.982e3,
@@ -137,7 +137,7 @@
         ]
     end
 
-    @test ForwardDiff.derivative(final_els_els, 5.0)[end] != 0.0
+    @test ForwardDiff.derivative(final_els_time, 5.0)[end] != 0.0
 end
 
 # @testset "Two-Body Orbit Propagator" verbose = true begin
