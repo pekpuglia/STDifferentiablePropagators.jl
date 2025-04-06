@@ -25,9 +25,13 @@ elements `orb₀`.
 - `m0::T`: Standard gravitational parameter of the central body [m³ / s²].
     (**Default** = `tbc_m0`)
 """
-function Propagators.init(::Val{:TwoBody}, orb₀::KeplerianElements; m0::Number = tbc_m0)
-    tbd = twobody_init(orb₀; m0 = m0)
-    return OrbitPropagatorTwoBody(tbd)
+function Propagators.init(::Val{:TwoBody}, orb₀::KeplerianElements; m0::Number = tbc_m0, propagation_type=nothing)
+    propagation_type = something(propagation_type, typeof(m0))
+
+    orb0 = KeplerianElements{propagation_type, propagation_type}(getfield.(Ref(orb₀), fieldnames(KeplerianElements))...)
+    tbd = twobody_init(orb0; m0 = m0)
+    
+    return OrbitPropagatorTwoBody{propagation_type, propagation_type}(tbd)
 end
 
 """
@@ -52,11 +56,11 @@ end
 
 function Propagators.propagate!(orbp::OrbitPropagatorTwoBody, t::Number)
     # Auxiliary variables.
-    return_type = promote_type(typeof(orbp.tbd.Δt), typeof(orbp.tbd.orb₀.a))
-    tbd = TwoBodyPropagator{typeof(orbp.tbd.Δt), return_type}(getfield.(Ref(orbp.tbd), fieldnames(typeof(orbp.tbd)))...)
-
+    # return_type = promote_type(typeof(orbp.tbd.Δt), typeof(orbp.tbd.orb₀.a))
+    # tbd = TwoBodyPropagator{typeof(orbp.tbd.Δt), return_type}(getfield.(Ref(orbp.tbd), fieldnames(typeof(orbp.tbd)))...)
+    # orbp.tbd = tbd
     # Propagate the orbit.
-    return twobody!(tbd, t)
+    return twobody!(orbp.tbd, t)
 end
 
 ############################################################################################
