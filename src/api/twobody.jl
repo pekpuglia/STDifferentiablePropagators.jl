@@ -28,8 +28,8 @@ elements `orb₀`.
 function Propagators.init(::Val{:TwoBody}, orb₀::KeplerianElements; m0::Number = tbc_m0, propagation_type=nothing)
 
     if isnothing(propagation_type)
-    tbd = twobody_init(orb₀; m0 = m0)
-    optb = OrbitPropagatorTwoBody(tbd)
+        tbd = twobody_init(orb₀; m0 = m0)
+        optb = OrbitPropagatorTwoBody(tbd)
     else
         orb0 = KeplerianElements{propagation_type, propagation_type}(getfield.(Ref(orb₀), fieldnames(KeplerianElements))...)
         tbd = twobody_init(orb0; m0 = m0)
