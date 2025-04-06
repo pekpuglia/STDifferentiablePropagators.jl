@@ -3,6 +3,7 @@ using Test
 using Dates
 using StaticArrays
 using SatelliteToolboxPropagators
+using ForwardDiff
 
 # @testset "J2 Orbit Propagator" verbose = true begin
 #     include("./j2.jl")
